@@ -116,7 +116,9 @@ Same magic commnad is used with the modifed def generated after placement, post 
 - Standard cell libraries contains information about each cell like area, delay, threshold voltage & power consumption along with their drive strength.
 - All the stages and steps involved in the entire design of a standard cell are cumulatively called Cell Design Flow. The inputs, outputs and steps involved in the process of cell design are, 
 
-![image](https://user-images.githubusercontent.com/125293287/224706396-d7680022-d12e-4921-9a3e-58c933bfbf1f.png)
+<p width="100%">
+    <img width="60%" src="https://user-images.githubusercontent.com/125293287/224706396-d7680022-d12e-4921-9a3e-58c933bfbf1f.png"> 
+</p>
 
 ## Day 3 - Design library cell using Magic Layout and ngspice characterization
 
@@ -127,7 +129,9 @@ Spice netlist of any layout is required to simulate and verify the functionality
 - Identify nodes
 - name nodes
 
-![image](https://user-images.githubusercontent.com/125293287/224905465-5e5aebe4-9abf-4ec4-949f-434207388224.png)
+<p width="100%">
+    <img width="30%" src="https://user-images.githubusercontent.com/125293287/224905465-5e5aebe4-9abf-4ec4-949f-434207388224.png"> 
+</p>
 
 ### Threshold Voltage of CMOS
 
@@ -143,41 +147,59 @@ Spice netlist of any layout is required to simulate and verify the functionality
 ```
 magic -T sky130A.tech sky130_inv.mag
 ```
-![image](https://user-images.githubusercontent.com/125293287/224896774-ec7df8a2-eb6e-4af9-8d9d-5acd39c69ce8.png)
+<p width="100%">
+    <img width="80%" src="https://user-images.githubusercontent.com/125293287/224896774-ec7df8a2-eb6e-4af9-8d9d-5acd39c69ce8.png"> 
+</p>
 
 ## 16-Mask CMOS Process
 
 - Selecting a substrate
 
-![image](https://user-images.githubusercontent.com/125293287/224897820-471c2904-c00f-4faa-838b-aaef120a96a1.png)
+<p width="100%">
+    <img width="40%" src="https://user-images.githubusercontent.com/125293287/224897820-471c2904-c00f-4faa-838b-aaef120a96a1.png"> 
+</p>
 
 - Creating active region for transistors
 
-![image](https://user-images.githubusercontent.com/125293287/224898466-b9f4dc61-85f9-4850-991a-ba0d02744b84.png)
+<p width="100%">
+    <img width="40%" src="https://user-images.githubusercontent.com/125293287/224898466-b9f4dc61-85f9-4850-991a-ba0d02744b84.png"> 
+</p>
 
 - Nwell & Pwell formation (Twin Tub Process)
 
-![image](https://user-images.githubusercontent.com/125293287/224899038-e87534ae-fb03-44bd-a77c-d80424f22379.png)
+<p width="100%">
+    <img width="40%" src="https://user-images.githubusercontent.com/125293287/224899038-e87534ae-fb03-44bd-a77c-d80424f22379.png"> 
+</p>
 
 - Formation of Gate terminal
 
-![image](https://user-images.githubusercontent.com/125293287/224899616-5e3d1e53-722b-4087-9b16-c97a101e3047.png)
+<p width="100%">
+    <img width="40%" src="https://user-images.githubusercontent.com/125293287/224899616-5e3d1e53-722b-4087-9b16-c97a101e3047.png"> 
+</p>
 
 - LDD (Lightly Doped Drain) Formation it will avoid hot electron effect and short channel effect 
 
-![image](https://user-images.githubusercontent.com/125293287/224900204-cd4ab625-2031-4ca5-a79c-7a196a96c477.png)
+<p width="100%">
+    <img width="40%" src="https://user-images.githubusercontent.com/125293287/224900204-cd4ab625-2031-4ca5-a79c-7a196a96c477.png"> 
+</p>
 
 - Source and Drain Formation (High temperature annealing)
 
-![image](https://user-images.githubusercontent.com/125293287/224900972-0bdbc8de-abbf-4082-9886-d626ee6c2fec.png)
+<p width="100%">
+    <img width="40%" src="https://user-images.githubusercontent.com/125293287/224900972-0bdbc8de-abbf-4082-9886-d626ee6c2fec.png"> 
+</p>
 
 - Contact and local Interconnects formation (Sputtering, RCA cleaning)
 
-![image](https://user-images.githubusercontent.com/125293287/224901585-aed31133-aa12-40ef-b19e-82c48ecf1d1a.png)
+<p width="100%">
+    <img width="40%" src="https://user-images.githubusercontent.com/125293287/224901585-aed31133-aa12-40ef-b19e-82c48ecf1d1a.png"> 
+</p>
 
 - Higher Level metal layer formation
 
-![image](https://user-images.githubusercontent.com/125293287/224902629-c3baeaaa-bb1c-497b-a2ba-4eaddc693791.png)
+<p width="100%">
+    <img width="40%" src="https://user-images.githubusercontent.com/125293287/224902629-c3baeaaa-bb1c-497b-a2ba-4eaddc693791.png"> 
+</p>
 
 ### Lab-2 : Extract Spice Netlist from layout of the standard cell
 
@@ -224,3 +246,36 @@ ngspice 1 -> plot Y vs time A
 
 - This waveform is used to do the timing characerization.
 - Parameters like rise time delay, fall time delay, propagation delay are calculated.
+
+## Day 4 - Pre-layout timing analysis and importance of good clock tree
+
+- PnR requires just the pin placement and metal information, there is no need of providing any logic.
+- To incorporate any standard cell layout in OpenLANE RTL2GDS flow, it should be converted to a standard cell LEF. 
+- LEF stands for Library Exchange Format. It performs the interconnect routing in conjunction to routing guides generated from the PnR flow. 
+
+### Generating LEF file using magic software
+
+- Before creating the LEF file ensure that the design of the standard cell is honoring the foundry requirments.
+- ```tracks.info``` file gives information about the offset and pitch (minimum permissible grid size) of a track in a given layer both in horizontal and vertical direction. The track information is given in below mentioned format.
+ 
+```
+<layer-name> <X/Y direction> <track-offset> <track-pitch>
+```
+![image](https://user-images.githubusercontent.com/125293287/224986096-6e75fe05-6467-4884-800e-bd2f9a2abb19.png)
+
+To convert existing standard cell layout into LEF, following aspects should be taken into account,
+
+1. The input and ouptut of the cell should fall on intersection of the vertical and horizontal grid lines.
+
+<p width="100%">
+    <img width="40%" src="https://user-images.githubusercontent.com/125293287/224987187-dcb11765-11a7-43c4-adfe-cef96a958516.png"> 
+</p>
+
+2. Height of the cell should be odd multiple of the vertical track pitch, to ensure ```VPWR``` and ```VGND``` properly fall on the PDN.
+3. Width of the cell should be an odd multiple of the horizontal track pitch.
+
+<p width="100%">
+    <img width="40%" src="https://user-images.githubusercontent.com/125293287/224987673-ed6de716-ef6a-4810-a1af-2b53a85fd266.png"> 
+</p>
+
+We can veriy from the above image that the width and height of rectangle are odd multiple of x and y pitch respectively from ```tracks.info``` file.
