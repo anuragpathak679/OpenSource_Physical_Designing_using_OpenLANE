@@ -279,3 +279,20 @@ To convert existing standard cell layout into LEF, following aspects should be t
 </p>
 
 We can veriy from the above image that the width and height of rectangle are odd multiple of x and y pitch respectively from ```tracks.info``` file.
+
+After this all the ports of the custom inverter cell should be defined and correct class and use attributes for each port should be set.
+
+<p width="100%">
+    <img width="70%" src="https://user-images.githubusercontent.com/125293287/224992366-c7f47842-dd43-4b44-8c41-e0f1adbf3431.png"> 
+</p>
+
+After setting the properties, next step is to generate the LEF file.
+
+```
+lef write sky130_anurag_inv.lef
+```
+<p width="100%">
+    <img width="20%" src="https://user-images.githubusercontent.com/125293287/224993966-64a6f16a-9b58-4dc6-bc21-8589ae5bdb0d.png"> 
+</p>
+
+
