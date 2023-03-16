@@ -214,17 +214,35 @@ ext2spice cthresh 0 rthresh 0
 ext2spice
 ```
 - The generated spice file will be used for simulation using ngspice.
-Take a snippet of spice netlist
+
+![image](https://user-images.githubusercontent.com/125293287/225527647-571c0a4d-d1c1-4254-8ebf-49621501f629.png)
 
 ## Transient Analysis using ngspice
 
 - For running transient simulation using ngspice, need to include the relevent library data, source information and command in the spice netlist to run the simulation.
 
 ```
-M0 Y A VGND VGND nshort_model.0 ad=0 pd=0 as=0 ps=0 w=35 l=23
-M1 Y A VPWR VPWR pshort_model.0  ad=0 pd=0 as=0 ps=0 w=37 l=23
+* SPICE3 file created from sky130_inv.ext - technology: sky130A
+
+.option scale=0.01u
+.include ./libs/pshort.lib
+.include ./libs/nshort.lib
+//.subckt sky130_inv A Y VPWR VGND
+M0 Y A VPWR VPWR pshort_model.0 ad=1443 pd=152 as=1517 ps=156 w=37 l=23
+M1 Y A VGND VGND nshort_model.0 ad=1435 pd=152 as=1365 ps=148 w=35 l=23
+C0 VPWR A 0.07fF
 VDD VPWR 0 3.3V
 VSS VGND 0 0V
+Va A VGND PULSE(0V 3.3V 0 0.1ns 0.1ns 2ns 4ns)
+C1 Y A 0.05fF
+C2 Y VPWR 0.11fF
+C3 Y VGND 2fF
+C4 VPWR VGND 0.59fF
+.tran 1n 20n
+.control
+run
+.endc
+.end
 
 ```
 - To invoke ngspice we just have to use following commands
@@ -233,7 +251,9 @@ VSS VGND 0 0V
 ngspice <path_to_modifed_spice_netlist>
 ```
 
-![image](https://user-images.githubusercontent.com/125293287/224974450-24428061-730d-47f3-9333-ebcfd04cf1ff.png)
+<p align="left" width="100%">
+    <img width="40%" src="https://user-images.githubusercontent.com/125293287/225529053-c4e3d5e8-2b87-4013-b702-75cfbae79b2c.png"> 
+</p>
 
 - After that in the ngspice console we can use plot function to get the Inverter characterstic, input and output voltage wrt time.
 
@@ -241,8 +261,9 @@ ngspice <path_to_modifed_spice_netlist>
 ngspice 1 -> plot Y vs time A
 ```
 <p align="left" width="100%">
-    <img src="https://user-images.githubusercontent.com/125293287/224974245-55fcd939-3251-4af0-ab36-8d9d662aff6a.png"> 
+    <img width="60%" src="https://user-images.githubusercontent.com/125293287/225529305-bf40284b-6cd2-47ba-bc06-e93a7a64c9b3.png"> 
 </p>
+
 
 - This waveform is used to do the timing characerization.
 - Parameters like rise time delay, fall time delay, propagation delay are calculated.
@@ -253,7 +274,7 @@ ngspice 1 -> plot Y vs time A
 - To incorporate any standard cell layout in OpenLANE RTL2GDS flow, it should be converted to a standard cell LEF. 
 - LEF stands for Library Exchange Format. It performs the interconnect routing in conjunction to routing guides generated from the PnR flow. 
 
-### Generating LEF file using magic software
+### Exract LEF file using magic software
 
 - Before creating the LEF file ensure that the design of the standard cell is honoring the foundry requirments.
 - ```tracks.info``` file gives information about the offset and pitch (minimum permissible grid size) of a track in a given layer both in horizontal and vertical direction. The track information is given in below mentioned format.
@@ -295,4 +316,46 @@ lef write sky130_anurag_inv.lef
     <img width="20%" src="https://user-images.githubusercontent.com/125293287/224993966-64a6f16a-9b58-4dc6-bc21-8589ae5bdb0d.png"> 
 </p>
 
+### Include custom cell LEF in picorv32a design
 
+After generating the LEF file do some changes in the ```config.tcl``` file for our project like,
+
+- include the lef file for custom inverter cell
+```
+set ::env(EXTRA_LEFS) [glob $::env(OPENLANE_ROOT)/designs/$::env(DESIGN_NAME)/src/*.lef]
+```
+- Also we need to set the library path to include standard cell information
+```
+set ::env(LIB_SYNTH) "$::env(OPENLANE_ROOT)/designs/picorv32a/src/sky130_fd_sc_hd__typical.lib"
+set ::env(LIB_FASTEST) "$::env(OPENLANE_ROOT)/designs/picorv32a/src/sky130_fd_sc_hd__fast.lib"
+set ::env(LIB_SLOWEST) "$::env(OPENLANE_ROOT)/designs/picorv32a/src/sky130_fd_sc_hd__slow.lib"
+set ::env(LIB_TYPICAL) "$::env(OPENLANE_ROOT)/designs/picorv32a/src/sky130_fd_sc_hd__typical.lib"
+```
+After modifying the config file run synthesis, and just before ```run_synthesis``` step add following commands in the console.
+```
+set lefs [glob $::env(DESIGN_DIR)/src/*.lef]
+add_lefs -src $lefs
+```
+<p width="100%">
+    <img width="50%" src="https://user-images.githubusercontent.com/125293287/225566867-f2e04050-f5f7-43fc-add4-a950f3e7fafe.png"> 
+</p>
+
+After running synthesis we can see that ```tns (total negative slack)``` and ```wns (worst negative slack)``` to be negative, it implies there is some violation which we will have to fix.
+
+### Standalone STA using OpenSTA
+STA or Static Timing Analysis can be performed outside the OpenLANE flow by directly invoking OpenSTA. 
+
+This requires extra configuration to be done to specific the verilog file, constraints, clcok period and other required parameters.
+OpenSTA is invoked using the below mentioned command.
+
+```
+set_cmd_units -time ns -capacitance pF -current mA -voltage V -resistance kOhm -distance um
+read_liberty -min /home/anurag.pathak/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/src/sky130_fd_sc_hd__fast.lib
+read_liberty -max /home/anurag.pathak/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/src/sky130_fd_sc_hd__slow.lib
+read_verilog /home/anurag.pathak/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/10-03_08-44/results/synthesis/picorv32a.synthesis.v
+link_design picorv32a
+read_sdc /home/anurag.pathak/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/src/my_base.sdc
+report_checks -path_delay min_max -fields {slew trans net cap input_pin}
+report_tns
+report_wns
+```
