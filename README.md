@@ -428,5 +428,40 @@ Verify that for both min_path and max_path timing condition is met.
 
 # Day 5 - Final steps for RTL2GDS using tritonRoute and openSTA
 
-## Global Routing vs Detailed Routing
+## Designing Power Distribution Network
+
+PDN or Power Distribution Network consists of all the tracks, rails required for routing power to the entire chip.
+
+<p width="100%">
+    <img width="50%" src="https://user-images.githubusercontent.com/125293287/225680921-36522c98-66bb-4bc1-98b1-5fdac7d54b5b.png"> 
+</p>
+
+In general power distribution network is generated before the placement step, but in the OpenLANE flow it happens after the Clock Tree Synthesis(CTS).  
+
+```
+gen_pdn
+```
+![image](https://user-images.githubusercontent.com/125293287/225685933-7a44e874-92c5-4859-bcbf-7862563e40b9.png)
+
+## Routing
+
+Process of getting the best possible/shortest possible path between the source and the target.
+Ensure less number of twists and turns and minimal zigzag shapes.
+The routing process is implemented in two stages:
+- Global Routing : Entire routing region is partitioned into tiles. Decide tile-to-tile paths for all nets which is known as guide.
+- Detailed Routing : After the routing guide is provided, exact tracks and vias are generated iteratively.
+OpenLANE uses FastRoute as global and TritonRoute as the detailed routing engine. TritonRoute 14 ensures there are no DRC violations after routing but it takes significant runtime.
+
+To execute routing, 
+```
+run_routing
+```
+After the routing is completed, check for the routing violations if any,
+
+![image](https://user-images.githubusercontent.com/125293287/225691441-77ba8332-15e1-44b0-9415-e5beb224d603.png)
+
+
+
+
+
 
