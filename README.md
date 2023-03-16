@@ -10,7 +10,7 @@ OpenLANE furnishes a complete automated RTL2GDSII flow which consists of several
 
 As mentioned in the above flowchart the flow looks something like this, (input) RTL -> Synthesis -> floorplan + powerplan -> placement -> CTS -> Routing -> GDSII (final output)
 
-## Day 1 - Inception of open-source EDA, OpenLANE and Sky130 PDK
+# Day 1 - Inception of open-source EDA, OpenLANE and Sky130 PDK
 
 First of all move to the openlane folder and enable docker.
 ```
@@ -20,13 +20,13 @@ To invoke OpenLANE in interactive mode, run the ```./flow.tcl``` script and use 
 ``` 
 ./flow.tcl -interactive 
 ```
-### Lab-1 : Design preparation and synthesis
+## Lab-1 : Design preparation and synthesis
 
 After invoking OpenLANE first import the package of openLANE version, in our case the required version is 0.9.
 ```
 package require openlane 0.9
 ```
-#### Design Preparation
+### Design Preparation
 Prepare the design, picorv32a for the OpenLANE flow. 
 ```
 prep -design <design-name>
@@ -35,7 +35,7 @@ Design preparation will merge the technology lef and standard cell lef informati
 
 Environment variables or the parameters required for the run are stored in config.tcl file.
 
-#### Synthesis
+### Synthesis
 The next step is to run_synthesis using the yosys and abc tools.
 
 ```
@@ -45,9 +45,9 @@ This will take some time and then a success message will come up.
 
 ![image](https://user-images.githubusercontent.com/125293287/224402145-bb1a5473-7487-45d5-8280-4ee16d7e2472.png)
 
-## Day 2 - Good floorplan vs bad floorplan and introduction to library cells
+# Day 2 - Good floorplan vs bad floorplan and introduction to library cells
 
-### Floorplanning
+## Floorplanning
 Simple arrangement of logical block, library cells, pins on die. it ensures that every module has been assigned an appropriate area and aspect ratio, every pin of the module has connection with other modules or periphery of the chip and modules are arranged to consume lesser area.
 
  - Core and Die : 
@@ -61,13 +61,13 @@ IP's such as Memory Cells, Clock-gating Cells etc. are desiged only once and the
  - Decoupling Caps : 
 Capacitors placed close to preplaced cells to ensure smooth transfer of logic between them. These capacitors will charge up to the power supply voltage over time and behave like the power supply which faces drop due to the interconnect wires.
 
-### Powerplanning
+## Powerplanning
 Power grid network is created to distribute power to each part of the design symmetrically. This will help reduce the IR drop and charge accumulation at a particular ground, ground nounce which causes high noise margins.
 
  - Pin Placement : 
 Decide the timing delays and number of buffers required in the whole core, the input pins of a particular block are placed near the block. Clock nets are thicker than the normal routing wire as these wires mainly drive the whole design continuously hence a low resistance path is required.
 
-### Lab-1 : Run floorplan
+## Lab-1 : Run floorplan
 To run floorplan simply use the following command.
 ```
 %run_floorplan
@@ -90,7 +90,7 @@ We can check if the horizontal pins are in third layer,
 
 ![image](https://user-images.githubusercontent.com/125293287/224412191-e9db1096-8669-4154-857e-dfbec3a66b36.png)
 
-### Placement
+## Placement
 
 - Placement step determines the location of each component on the die using def and binds the netlist to the standard cell library given by foundary which contains details of cell like height, width and delay.
 - Standard cells will be placed on the floorplan according to the given netlist without disturbing the preplaced cells in floorplan.
@@ -102,7 +102,7 @@ The DEF file created during floorplan forms the input to placement step. Placeme
 
 Process of placement is iterative till the value of overflow converges to 0.
 
-### Lab-2 : Run placement 
+## Lab-2 : Run placement 
 To run placement following command is used,
 ```
 %run_placement
@@ -111,7 +111,7 @@ Same magic commnad is used with the modifed def generated after placement, post 
 
 ![image](https://user-images.githubusercontent.com/125293287/224415113-55580e59-14ed-46e9-b59b-b76cb46c3304.png)
 
-### Cell design and Characterization
+## Cell design and Characterization
 
 - Standard cell libraries contains information about each cell like area, delay, threshold voltage & power consumption along with their drive strength.
 - All the stages and steps involved in the entire design of a standard cell are cumulatively called Cell Design Flow. The inputs, outputs and steps involved in the process of cell design are, 
@@ -120,9 +120,9 @@ Same magic commnad is used with the modifed def generated after placement, post 
     <img width="60%" src="https://user-images.githubusercontent.com/125293287/224706396-d7680022-d12e-4921-9a3e-58c933bfbf1f.png"> 
 </p>
 
-## Day 3 - Design library cell using Magic Layout and ngspice characterization
+# Day 3 - Design library cell using Magic Layout and ngspice characterization
 
-### Spice netlist
+## Spice netlist
 Spice netlist of any layout is required to simulate and verify the functionality. A spice deck contains following information,
 - Component connectivity
 - Component value
@@ -133,13 +133,13 @@ Spice netlist of any layout is required to simulate and verify the functionality
     <img width="30%" src="https://user-images.githubusercontent.com/125293287/224905465-5e5aebe4-9abf-4ec4-949f-434207388224.png"> 
 </p>
 
-### Threshold Voltage of CMOS
+## Threshold Voltage of CMOS
 
 - The voltage which input voltage to an CMOS inverter is equal to the output voltage, i.e. Vin = Vout. 
 - It is a function of the W/L ratio of the device and varying the W/L ratio will vary the output and the transfer charecteristic of the device.
 - A perfectly symmetrical device will have a switching threshold such that Vin = Vout = VDD/2 which is achieved when (W/L) ratio of PMOS is approximatly 2.5 times the (W/L) ratio of NMOS.
 
-### Lab-1 : CMOS Inverter Design using Magic
+## Lab-1 : CMOS Inverter Design using Magic
 - Magic tool is being used to design the CMOS inverter. It also has inbuilt DRC check feature
 - It takes the mag file and the technology file as an input (sky130A.tech in this case). 
 - Clone the repo from https://github.com/nickson-jose/vsdstdcelldesign.git. 
@@ -201,7 +201,7 @@ magic -T sky130A.tech sky130_inv.mag
     <img width="40%" src="https://user-images.githubusercontent.com/125293287/224902629-c3baeaaa-bb1c-497b-a2ba-4eaddc693791.png"> 
 </p>
 
-### Lab-2 : Extract Spice Netlist from layout of the standard cell
+## Lab-2 : Extract Spice Netlist from layout of the standard cell
 
 Extraction of spice netlist from the standard cell layout is done using the magic software in 3 steps,
 - Create the extraction file 
@@ -268,13 +268,13 @@ ngspice 1 -> plot Y vs time A
 - This waveform is used to do the timing characerization.
 - Parameters like rise time delay, fall time delay, propagation delay are calculated.
 
-## Day 4 - Pre-layout timing analysis and importance of good clock tree
+# Day 4 - Pre-layout timing analysis and importance of good clock tree
 
 - PnR requires just the pin placement and metal information, there is no need of providing any logic.
 - To incorporate any standard cell layout in OpenLANE RTL2GDS flow, it should be converted to a standard cell LEF. 
 - LEF stands for Library Exchange Format. It performs the interconnect routing in conjunction to routing guides generated from the PnR flow. 
 
-### Exract LEF file using magic software
+## Exract LEF file using magic software
 
 - Before creating the LEF file ensure that the design of the standard cell is honoring the foundry requirments.
 - ```tracks.info``` file gives information about the offset and pitch (minimum permissible grid size) of a track in a given layer both in horizontal and vertical direction. The track information is given in below mentioned format.
@@ -316,7 +316,7 @@ lef write sky130_anurag_inv.lef
     <img width="20%" src="https://user-images.githubusercontent.com/125293287/224993966-64a6f16a-9b58-4dc6-bc21-8589ae5bdb0d.png"> 
 </p>
 
-### Include custom cell LEF in picorv32a design
+## Include custom cell LEF in picorv32a design
 
 After generating the LEF file do some changes in the ```config.tcl``` file for our project like,
 
@@ -337,16 +337,18 @@ set lefs [glob $::env(DESIGN_DIR)/src/*.lef]
 add_lefs -src $lefs
 ```
 <p width="100%">
-    <img width="50%" src="https://user-images.githubusercontent.com/125293287/225566867-f2e04050-f5f7-43fc-add4-a950f3e7fafe.png"> 
+    <img width="60%" src="https://user-images.githubusercontent.com/125293287/225614571-0860d92a-ccd5-4d00-8336-c96d673c3d02.png"> 
 </p>
 
 After running synthesis we can see that ```tns (total negative slack)``` and ```wns (worst negative slack)``` to be negative, it implies there is some violation which we will have to fix.
 
-### Standalone STA using OpenSTA
+## Standalone STA using OpenSTA
 STA or Static Timing Analysis can be performed outside the OpenLANE flow by directly invoking OpenSTA. 
 
-This requires extra configuration to be done to specific the verilog file, constraints, clcok period and other required parameters.
-OpenSTA is invoked using the below mentioned command.
+Steps to be followed are as follows,
+- Copy the ```my_base.sdc``` file from https://github.com/nickson-jose/vsdstdcelldesign/tree/master/extras
+- Match the clock period with the clock period set in ```openlane_dir/openlane/designs/picorv32a/src/sky130_fd_sc_hd__typical.lib```
+- Create ```pre_sta.conf``` file that contains path to the verilog file, constraints, clcok period and other required parameters.
 
 ```
 set_cmd_units -time ns -capacitance pF -current mA -voltage V -resistance kOhm -distance um
@@ -359,3 +361,72 @@ report_checks -path_delay min_max -fields {slew trans net cap input_pin}
 report_tns
 report_wns
 ```
+Invoke OpenSTA
+
+```
+sta pre_sta.conf
+```
+We can match the tns and wns values which we got from the STA analysis wthin ```run_synthesis``` step.
+<p width="100%">
+    <img width="50%" src="https://user-images.githubusercontent.com/125293287/225614866-2aee641a-1ddc-45cf-802b-90fd3aa88d4a.png"> 
+</p>
+
+## Handling timing violations
+
+Timing violaions being observed in the analysis can be reduced using following strategies:
+
+- Changing the SYNTH_STRATEGY and keep DELAY as optimizing criteria.
+- Enable SYNTH_SIZING. 
+- Decrease the MAX_FANOUT : output capacitance will decrease and hence the delay.
+- Scaling the buffers : increase the design area
+
+<p width="100%">
+    <img width="60%" src="https://user-images.githubusercontent.com/125293287/225617987-952dd1ba-af5f-4eaa-9815-4dcd8d958e36.png"> 
+</p>
+
+After fixing the timing violation run the floorplan and placement step and open the layout using magic.
+
+
+## Clock Tree Synthesis
+
+The process of evenly distributing clocks to all sequential elements in the design is called CLock Tree Synthesis or simply CTS. The objective here is to minimize the clock delay and skew. Several CTS techniques are H - Tree, X - Tree and Fish bone CTS.
+CTS is done after placement in openLANE flow.
+
+```
+run_cts
+```
+![image](https://user-images.githubusercontent.com/125293287/225622777-6c9ee00a-5d0a-462f-879b-3441f251ee46.png)
+
+
+## Post-CTS STA Analysis
+
+A new netlist ```<design_name>.synthesis_cts.v``` which contains the information about Clock buffers is generated post CTS. We can perform the STA analysis on the new netlist with actual clocks.
+
+Perform STA analysis within OpenLANE by invoking OpenROAD. Following commands should be executed in openlane;
+
+```
+openroad
+read_lef /openLANE_flow/designs/picorv32a/runs/16-03_12-13/tmp/merged.lef
+read_def /openLANE_flow/designs/picorv32a/runs/16-03_12-13/results/cts/picorv32a.cts.def
+write_db pico_cts.db
+read_db pico_cts.db
+read_verilog /openLANE_flow/designs/picorv32a/runs/16-03_12-13/results/synthesis/picorv32a.synthesis_cts.v
+read_liberty -max $::env(LIB_SLOWEST)
+read_liberty -min $::env(LIB_FASTEST)
+read_sdc /openLANE_flow/designs/picorv32a/src/my_base.sdc
+set_propagated_clock [all_clocks]
+report_checks -path_delay min_max -format full_clock_expanded -digits 4
+```
+Verify that for both min_path and max_path timing condition is met.
+
+  <table border="0">
+  <tr>
+    <td align="center"> <img width="90%" src="https://user-images.githubusercontent.com/125293287/225629781-f26fa243-98ea-4346-a844-3d10d7f3be72.png"> </td>
+    <td align="center"> <img width="80%" src="https://user-images.githubusercontent.com/125293287/225630241-d1d77dc1-ef8f-427f-97a9-e653f6ae403a.png"> </td>
+  </tr>
+  </table>
+
+# Day 5 - Final steps for RTL2GDS using tritonRoute and openSTA
+
+## Global Routing vs Detailed Routing
+
