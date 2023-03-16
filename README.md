@@ -460,8 +460,21 @@ After the routing is completed, check for the routing violations if any,
 
 ![image](https://user-images.githubusercontent.com/125293287/225691441-77ba8332-15e1-44b0-9415-e5beb224d603.png)
 
+Now hook up the final ```DEF``` file ```/openLANE_flow/designs/picorv32a/runs/16-03_12-13/results/routing/picorv32a.def``` with the ```tech``` file and the ```LEF``` to get the final layout using ```magic```.
 
+![image](https://user-images.githubusercontent.com/125293287/225694761-9a13732a-b85b-43be-b7cf-18ab77da96eb.png)
 
+## SPEF Extraction
 
+- Standard Parasitic Exchange Format (SPEF) is the format to represent parasitic data, Resistance and Capacitance of the routed path.
+- For generating SPEF file, OpenLANE has a tool known as SPEF_EXTRACTOR.
+- It is a python based parser which takes the LEF and DEF files as input arguments and generates the SPEF file. 
+- This is automatically executed when ```run_routing``` step is performed.
+- SPEF file is required to execute post-route STA analysis.
 
-
+  <table border="0">
+  <tr>
+    <td align="center"> <img width="80%" src="https://user-images.githubusercontent.com/125293287/225703138-648ebbd2-6e03-4050-8553-7fddde53f9fe.png"> </td>
+    <td align="center"> <img width="80%" src="https://user-images.githubusercontent.com/125293287/225703682-e1da5eec-b6bf-422e-88a3-f45f0d8df8b8.png"> </td>
+  </tr>
+  </table>
